@@ -49,7 +49,7 @@ def kontrol_et(kanal_adi, kanal_id):
 # Tekrarlayan kontrol fonksiyonu
 def tekrarlayan_kontrol(kanal_adi, kanal_id):
     print(f"{kanal_adi} için 2 dk sonra başlayacak 1 saatlik tekrarlayan kontrol başlıyor.")
-    time.sleep(5)  # 2 dakika bekle
+    time.sleep(120)  # 2 dakika bekle
 
     for i in range(6):  # 6 kere kontrol, her biri 10 dakika arayla
         bulundu = kontrol_et(kanal_adi, kanal_id)
@@ -58,7 +58,7 @@ def tekrarlayan_kontrol(kanal_adi, kanal_id):
             break
         if i < 5:
             print(f"{kanal_adi} kontrolü {i+1}. kez yapıldı, 10 dk bekleniyor...")
-            time.sleep(6)  # 10 dakika bekle
+            time.sleep(600)  # 10 dakika bekle
 
 # Schedule fonksiyonlarını güncelle
 def kontrol_hayalhanem_mersin():
