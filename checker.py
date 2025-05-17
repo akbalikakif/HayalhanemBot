@@ -1,7 +1,7 @@
 import requests
 import schedule
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 
 # === AYARLAR ===
 BOT_TOKEN = '7566188625:AAGtwL6wFtZLxgUwzb8kufEVAtFWEG5d8eg'
@@ -41,10 +41,20 @@ def kontrol_et(kanal_adi, kanal_id):
             video = data["items"][0]
             video_baslik = video["snippet"]["title"]
             video_tarih_utc = video["snippet"]["publishedAt"]
-            video_tarih = turkiye_saati_iso8601(video_tarih_utc)
-            mesaj = f"✅ {kanal_adi} kanalında yeni video kontrolü yapıldı.\n📹 Video: {video_baslik}\n🕒 Yayınlanma: {video_tarih}"
-            telegram_gonder(mesaj)
-            return True  # Video bulunduysa True dön
+
+            # Video yayın zamanı (UTC olarak ve timezone-aware hale getiriliyor)
+            video_zaman = datetime.strptime(video_tarih_utc, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+            simdi = datetime.now(timezone.utc)
+
+            fark = simdi - video_zaman
+            if fark <= timedelta(hours=1):  # Son 1 saat içinde mi?
+                video_tarih = turkiye_saati_iso8601(video_tarih_utc)
+                mesaj = f"✅ {kanal_adi} kanalında yeni video kontrolü yapıldı.\n📹 Video: {video_baslik}\n🕒 Yayınlanma: {video_tarih}"
+                telegram_gonder(mesaj)
+                return True
+            else:
+                telegram_gonder(f"{kanal_adi} kanalında  son 1 saatte video atılmamış.")
+                return False
         else:
             telegram_gonder(f"{kanal_adi} kanalında video bulunamadı.")
             return False
