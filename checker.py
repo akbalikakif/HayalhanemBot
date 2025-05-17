@@ -1,7 +1,7 @@
 import requests
 import schedule
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # === AYARLAR ===
 BOT_TOKEN = '7566188625:AAGtwL6wFtZLxgUwzb8kufEVAtFWEG5d8eg'
@@ -26,6 +26,11 @@ def telegram_gonder(mesaj):
     except requests.exceptions.RequestException as e:
         print(f"Telegram'a mesaj gönderilemedi: {e}")
 
+def turkiye_saati_iso8601(iso_string):
+    utc_time = datetime.strptime(iso_string, "%Y-%m-%dT%H:%M:%SZ")
+    turkiye_time = utc_time + timedelta(hours=3)
+    return turkiye_time.strftime("%d.%m.%Y %H:%M:%S")
+
 def kontrol_et(kanal_adi, kanal_id):
     url = f"https://www.googleapis.com/youtube/v3/search?key={API_KEY}&channelId={kanal_id}&part=snippet,id&order=date&maxResults=1"
     try:
@@ -35,7 +40,8 @@ def kontrol_et(kanal_adi, kanal_id):
         if data.get("items"):
             video = data["items"][0]
             video_baslik = video["snippet"]["title"]
-            video_tarih = video["snippet"]["publishedAt"]
+            video_tarih_utc = video["snippet"]["publishedAt"]
+            video_tarih = turkiye_saati_iso8601(video_tarih_utc)
             mesaj = f"✅ {kanal_adi} kanalında yeni video kontrolü yapıldı.\n📹 Video: {video_baslik}\n🕒 Yayınlanma: {video_tarih}"
             telegram_gonder(mesaj)
             return True  # Video bulunduysa True dön
@@ -100,8 +106,6 @@ schedule.every().thursday.at("19:30").do(kontrol_ankara_iki_haftada_bir)
 schedule.every().thursday.at("20:00").do(kontrol_hayalhanem_almanya)
 
 print("Bot başlatıldı...")
-
-tekrarlayan_kontrol("Hayalhanem Mersin", KANALLAR["Hayalhanem Mersin"])
 
 while True:
     schedule.run_pending()
