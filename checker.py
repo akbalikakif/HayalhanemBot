@@ -4,9 +4,9 @@ import time
 from datetime import datetime
 
 # === AYARLAR ===
-TELEGRAM_TOKEN = 'AAGtwL6wFtZLxgUwzb8kufEVAtFWEG5d8eg'
-TELEGRAM_CHAT_ID = '1036357014'
-YOUTUBE_API_KEY = 'AIzaSyBUhUL4sTVa7m9XcA9eezOEFXJ6FbnybSA'
+BOT_TOKEN = '7566188625:AAGtwL6wFtZLxgUwzb8kufEVAtFWEG5d8eg'
+CHAT_ID = '1036357014'
+API_KEY = 'AIzaSyBUhUL4sTVa7m9XcA9eezOEFXJ6FbnybSA'
 
 KANALLAR = {
     "Hayalhanem Mersin": "UCXs8nFqUPQaJZxAt1b3Wblw",
@@ -42,52 +42,58 @@ def kontrol_et(kanal_adi, kanal_id):
     except Exception as e:
         telegram_gonder(f"{kanal_adi} kontrolünde hata oluştu: {e}")
 
-# === Fonksiyonlar ===
+# Tekrarlayan kontrol fonksiyonu
+def tekrarlayan_kontrol(kanal_adi, kanal_id):
+    print(f"{kanal_adi} için 2 dk sonra başlayacak 1 saatlik tekrarlayan kontrol başlıyor.")
+    time.sleep(120)  # 2 dakika bekle
+
+    for i in range(6):  # 6 kere kontrol, her biri 10 dakika arayla
+        kontrol_et(kanal_adi, kanal_id)
+        if i < 5:
+            print(f"{kanal_adi} kontrolü {i+1}. kez yapıldı, 10 dk bekleniyor...")
+            time.sleep(600)  # 10 dakika bekle
+
+# Schedule fonksiyonlarını güncelle
 def kontrol_hayalhanem_mersin():
-    kontrol_et("Hayalhanem Mersin", KANALLAR["Hayalhanem Mersin"])
+    tekrarlayan_kontrol("Hayalhanem Mersin", KANALLAR["Hayalhanem Mersin"])
 
 def kontrol_mehmet_yildiz():
-    kontrol_et("Mehmet Yıldız", KANALLAR["Mehmet Yıldız"])
+    tekrarlayan_kontrol("Mehmet Yıldız", KANALLAR["Mehmet Yıldız"])
 
 def kontrol_hayalhanem_istanbul():
-    kontrol_et("Hayalhanem İstanbul", KANALLAR["Hayalhanem İstanbul"])
+    tekrarlayan_kontrol("Hayalhanem İstanbul", KANALLAR["Hayalhanem İstanbul"])
 
 def kontrol_hayalhanem_ankara():
-    kontrol_et("Hayalhanem Ankara", KANALLAR["Hayalhanem Ankara"])
+    tekrarlayan_kontrol("Hayalhanem Ankara", KANALLAR["Hayalhanem Ankara"])
 
 def kontrol_hayalhanem_almanya():
-    kontrol_et("Hayalhanem Almanya", KANALLAR["Hayalhanem Almanya"])
+    tekrarlayan_kontrol("Hayalhanem Almanya", KANALLAR["Hayalhanem Almanya"])
 
 # === Schedule Ayarları ===
-
-# Mersin: Pazartesi Çarşamba Cuma Pazar 19.00
 schedule.every().monday.at("19:00").do(kontrol_hayalhanem_mersin)
 schedule.every().wednesday.at("19:00").do(kontrol_hayalhanem_mersin)
 schedule.every().friday.at("19:00").do(kontrol_hayalhanem_mersin)
 schedule.every().sunday.at("19:00").do(kontrol_hayalhanem_mersin)
 
-# Mehmet Yıldız: Salı Perşembe Cumartesi 19.00
 schedule.every().tuesday.at("19:00").do(kontrol_mehmet_yildiz)
 schedule.every().thursday.at("19:00").do(kontrol_mehmet_yildiz)
-schedule.every().saturday.at("19:00").do(kontrol_mehmet_yildiz)
+schedule.every().saturday.at("19:17").do(kontrol_mehmet_yildiz)
 
-# İstanbul: Salı Perşembe 18.00
 schedule.every().tuesday.at("18:00").do(kontrol_hayalhanem_istanbul)
 schedule.every().thursday.at("18:00").do(kontrol_hayalhanem_istanbul)
 
-# Ankara: Salı 19.30 | Perşembe 2 haftada bir 19.30
 schedule.every().tuesday.at("19:30").do(kontrol_hayalhanem_ankara)
+
 def kontrol_ankara_iki_haftada_bir():
     if datetime.now().isocalendar().week % 2 == 0:
-        kontrol_hayalhanem_ankara()
+        tekrarlayan_kontrol("Hayalhanem Ankara", KANALLAR["Hayalhanem Ankara"])
+
 schedule.every().thursday.at("19:30").do(kontrol_ankara_iki_haftada_bir)
 
-# Almanya: Perşembe 20.00
 schedule.every().thursday.at("20:00").do(kontrol_hayalhanem_almanya)
 
-# === Sonsuz Döngü ===
 print("Bot başlatıldı...")
 
 while True:
     schedule.run_pending()
-    time.sleep(60)
+    time.sleep(1)  # 1 saniye bekle daha hızlı tepki için
