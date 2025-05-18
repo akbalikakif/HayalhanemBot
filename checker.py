@@ -44,7 +44,8 @@ def kontrol_et(kanal_adi, kanal_id):
 
             # Video yayın zamanı (UTC olarak ve timezone-aware hale getiriliyor)
             video_zaman = datetime.strptime(video_tarih_utc, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
-            simdi = datetime.now(timezone.utc)
+            turkiye_saati = timezone(timedelta(hours=3))
+            simdi = datetime.now(turkiye_saati)
 
             fark = simdi - video_zaman
             if fark <= timedelta(hours=1):  # Son 1 saat içinde mi?
