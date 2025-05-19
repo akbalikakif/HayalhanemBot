@@ -44,8 +44,7 @@ def kontrol_et(kanal_adi, kanal_id):
 
             # Video yayın zamanı (UTC olarak ve timezone-aware hale getiriliyor)
             video_zaman = datetime.strptime(video_tarih_utc, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
-            turkiye_saati = timezone(timedelta(hours=3))
-            simdi = datetime.now(turkiye_saati)
+            simdi = datetime.now(timezone.utc)
 
             fark = simdi - video_zaman
             if fark <= timedelta(hours=1):  # Son 1 saat içinde mi?
@@ -94,27 +93,27 @@ def kontrol_hayalhanem_almanya():
     tekrarlayan_kontrol("Hayalhanem Almanya", KANALLAR["Hayalhanem Almanya"])
 
 # === Schedule Ayarları ===
-schedule.every().monday.at("19:00").do(kontrol_hayalhanem_mersin)
-schedule.every().wednesday.at("19:00").do(kontrol_hayalhanem_mersin)
-schedule.every().friday.at("19:00").do(kontrol_hayalhanem_mersin)
-schedule.every().sunday.at("19:00").do(kontrol_hayalhanem_mersin)
+schedule.every().monday.at("16:00").do(kontrol_hayalhanem_mersin)
+schedule.every().wednesday.at("16:00").do(kontrol_hayalhanem_mersin)
+schedule.every().friday.at("16:00").do(kontrol_hayalhanem_mersin)
+schedule.every().sunday.at("16:00").do(kontrol_hayalhanem_mersin)
 
-schedule.every().tuesday.at("19:00").do(kontrol_mehmet_yildiz)
-schedule.every().thursday.at("19:00").do(kontrol_mehmet_yildiz)
-schedule.every().saturday.at("19:00").do(kontrol_mehmet_yildiz)
+schedule.every().tuesday.at("16:00").do(kontrol_mehmet_yildiz)
+schedule.every().thursday.at("16:00").do(kontrol_mehmet_yildiz)
+schedule.every().saturday.at("16:00").do(kontrol_mehmet_yildiz)
 
-schedule.every().tuesday.at("18:00").do(kontrol_hayalhanem_istanbul)
-schedule.every().thursday.at("18:00").do(kontrol_hayalhanem_istanbul)
+schedule.every().tuesday.at("15:00").do(kontrol_hayalhanem_istanbul)
+schedule.every().thursday.at("15:00").do(kontrol_hayalhanem_istanbul)
 
-schedule.every().tuesday.at("19:30").do(kontrol_hayalhanem_ankara)
+schedule.every().tuesday.at("16:30").do(kontrol_hayalhanem_ankara)
 
 def kontrol_ankara_iki_haftada_bir():
     if datetime.now().isocalendar().week % 2 == 0:
         tekrarlayan_kontrol("Hayalhanem Ankara", KANALLAR["Hayalhanem Ankara"])
 
-schedule.every().thursday.at("19:30").do(kontrol_ankara_iki_haftada_bir)
+schedule.every().thursday.at("16:30").do(kontrol_ankara_iki_haftada_bir)
 
-schedule.every().thursday.at("20:00").do(kontrol_hayalhanem_almanya)
+schedule.every().thursday.at("17:00").do(kontrol_hayalhanem_almanya)
 
 print("Bot başlatıldı...")
 
